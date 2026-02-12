@@ -29,10 +29,10 @@ spec:
         image:  aayushregistry.azurecr.io/test-user-app:v3
         resources:
           requests:
-            cpu: "0.5"
+            cpu: "0.3"
             memory: 128Mi
           limits:
-            cpu: "0.7"
+            cpu: "0.5"
             memory: 256Mi
         imagePullPolicy: Always
         livenessProbe:
