@@ -6,8 +6,8 @@ metadata:
   name: test-user-app-ingress
 spec:
   rules:
-  # - host: test.user.app.com
-  -  http:
+  - host: test.user.app.com
+    http:
       paths:
       - path: /
         pathType: Prefix
