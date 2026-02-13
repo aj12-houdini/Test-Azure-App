@@ -5,7 +5,6 @@ kind: Ingress
 metadata:
   name: test-user-app-ingress
 spec:
-  ingressClassName: nginx
   rules:
   - host: test.user.app.com
     http:
