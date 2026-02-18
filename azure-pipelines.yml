@@ -2,78 +2,63 @@
 # Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
+
+  #This is the trigger for when this pipeline gets automatically triggered
 trigger:
-- master
+  branches:
+    include:
+      - master #Any commit to the main branch
 
 resources:
-- repo: self
+  - repo: self #Private Repository
 
 variables:
-
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '0b7e06eb-2b47-4db5-b886-aac3f90c8e59'
-  imageRepository: 'test-user-app'
-  containerRegistry: 'aayushregistry.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
-  imagePullSecret: 'aayushregistry46d1-auth'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  tag: "$(Build.BuildId)" #Tagging our image uniquely with the build agent id
+  containerRegistry: "AzureContainerRegistry" #Container Registry Connections (Gave an alias name in service connections on Azure Devops)
+  sourceBranchName: "$(Build.SourceBranchName)" #Source Branch Name
+  dockerFilePath: "DockerFile" #Docker File to build from
+  repository: "test-user-app" #Repository Name in ACR
+  vmImageName: "ubuntu-latest"
+  sourceDirectory: "$(Build.SourcesDirectory)"
 
 
+  #Defining the stages of our build/deploy flow
 stages:
-- stage: Build
-  displayName: Build stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+ - stage: Build
+   displayName: Build stage
+   jobs:
+   - job: Build
+     displayName: Build
+     pool: $(vmImageName)
+     steps:
+      - task: Docker@2
+        displayName: Build and push an image to ACR
+        inputs:
+          command: buildAndPush
+          containerRegistry: $(containerRegistry)
+          repository: $(repository)
+          Dockerfile: $(dockerFilePath)
+          tags: |
+              $(tag)
+ - stage: Deploy
+   displayName: Deploy Stage
+   dependsOn: Build
 
-    - upload: manifests
-      artifact: manifests
-
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-
-  jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    pool:
-      vmImage: $(vmImageName)
-    environment: 'aj12houdiniTestAzureApp.default'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              secretName: $(imagePullSecret)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-
-          - task: KubernetesManifest@0
-            displayName: Deploy to Kubernetes cluster
-            inputs:
-              action: deploy
-              manifests: |
-                $(Pipeline.Workspace)/manifests/deployment.yml
-                $(Pipeline.Workspace)/manifests/service.yml
-              imagePullSecrets: |
-                $(imagePullSecret)
-              containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
-
+   jobs:
+    - deployment: deploy
+      displayName: Deploying
+      pool:
+        vmImage: $(vmImageName)
+      environment: dev
+      strategy:
+        rolling:
+          deploy:
+            steps:
+              - task: KubernetesManifest@1
+                displayName: Kubernetes Deployment
+                inputs:
+                  action: deploy
+                  kubernetesServiceConnection: 'k8Conenctions'
+                  namespace: default
+                  manifests: "$(sourceDirectory)/deployment.yaml"
+                  containers: "$(containerRegistry)/$(repository):$(tag)"
