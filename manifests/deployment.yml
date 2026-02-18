@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: ajhoudinitestazureapp 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ajhoudinitestazureapp
+  template:
+    metadata:
+      labels:
+        app: ajhoudinitestazureapp 
+    spec:
+      containers:
+        - name: ajhoudinitestazureapp 
+          image: aayushregistry.azurecr.io/ajhoudinitestazureapp
+          ports:
+          - containerPort: 3000
