@@ -42,7 +42,7 @@ stages:
           containerRegistry: $(containerRegistry)
           command: login
       - script: | 
-         docker buildx build --platform linux/arm64 -t aayushregistry.azurecr.io/test-user-app:102 --push .
+         docker buildx build --platform linux/amd64,linux/arm64 -t aayushregistry.azurecr.io/test-user-app:102 --push .
         displayName: Docker build
       - script: |
            echo "Pushed image:"
