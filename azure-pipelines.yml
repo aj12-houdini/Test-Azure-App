@@ -44,7 +44,7 @@ stages:
           command: build
           Dockerfile: $(dockerFilePath)
           repository: $(repository)
-          arguments: --platform linux/amd64
+          arguments: --platform linux/arm64
           tags: | 
               $(tag)
               latest
