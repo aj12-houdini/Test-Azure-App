@@ -21,7 +21,7 @@ spec:
           # - Each init container must complete successfully before the next one starts.
       containers:
       - name:  nginx-test-app
-        image: aayushregistry.azurecr.io/test-user-app:latest
+        image: aayushregistry.azurecr.io/test-user-app:32
         resources:
           requests:
             cpu: "0.3"
