@@ -32,44 +32,29 @@ stages:
      pool: 
       vmImage: $(vmImageName)
      steps:
-
-      -  script: | 
-          docker run --privileged --rm tonistiigi/binfmt --install all 
-         displayName: Enable cross platform
-      -  script: |
-          docker buildx create --driver docker-container --use
-          docker buildx inspect --bootstrap
-         displayName: Enable BuildX
       - task: Docker@2
         displayName: ACR Login
         inputs:
           containerRegistry: $(containerRegistry)
           command: login
-      - script: | 
-         docker buildx build  --platform linux/amd64,linux/arm64 --provenance=false --sbom=false -t aayushregistry.azurecr.io/test-user-app:889  --push .
-        displayName: Docker build
-      - script: |
-           echo "Pushed image:"
-           echo "aayushregistry.azurecr.io/test-user-app:102"
-        displayName: Output Image Name    
-      #   inputs: 
-      #     containerRegistry: $(containerRegistry)
-      #     command: build
-      #     Dockerfile: $(dockerFilePath)
-      #     repository: $(repository)
-      #     arguments: --platform linux/amd64
-      #     tags: | 
-      #         $(tag)
-      #         latest
-      # -  task: Docker@2
-      #    displayName: Docker Push
-      #    inputs: 
-      #     containerRegistry:  $(containerRegistry)
-      #     repository: $(repository)
-      #     command: push
-      #     tags: |
-      #         $(tag)
-      #         latest
+      - task: Docker@2    
+        inputs: 
+          containerRegistry: $(containerRegistry)
+          command: build
+          Dockerfile: $(dockerFilePath)
+          repository: $(repository)
+          arguments: --platform linux/amd64
+          tags: | 
+              $(tag)
+      -  task: Docker@2
+         displayName: Docker Push
+         inputs: 
+          containerRegistry:  $(containerRegistry)
+          repository: $(repository)
+          command: push
+          tags: |
+              $(tag)
+              latest
  - stage: Deploy
    displayName: Deploy Stage
    dependsOn: Build
