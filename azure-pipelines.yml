@@ -54,7 +54,6 @@ stages:
           command: push
           tags: |
               $(tag)
-              latest
  - stage: Deploy
    displayName: Deploy Stage
    dependsOn: Build
