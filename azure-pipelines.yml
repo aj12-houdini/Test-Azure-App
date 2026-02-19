@@ -34,7 +34,7 @@ stages:
      steps:
 
       -  script: | 
-          docker run --privileged -rm tonistiigi/binfmt --install all 
+          docker run --privileged --rm tonistiigi/binfmt --install all 
          displayName: Enable cross platform
       -  script: |
           docker buildx create --driver docker-container --use
