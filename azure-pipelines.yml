@@ -33,14 +33,30 @@ stages:
       vmImage: $(vmImageName)
      steps:
       - task: Docker@2
-        displayName: Build and push an image to ACR
+        displayName: ACR Login
         inputs:
-          command: buildAndPush
           containerRegistry: $(containerRegistry)
-          repository: $(repository)
+          command: login
+      - task: Docker@2
+        displayName: Docker build
+        inputs: 
+          containerRegistry: $(containerRegistry)
+          command: build
           Dockerfile: $(dockerFilePath)
+          repository: $(repository)
+          arguments: --platform linux/amd64
+          tags: | 
+              $(tag)
+              latest
+      -  task: Docker@2
+         displayName: Docker Push
+         inputs: 
+          containerRegistry:  $(containerRegistry)
+          repository: $(repository)
+          command: push
           tags: |
               $(tag)
+              latest
  - stage: Deploy
    displayName: Deploy Stage
    dependsOn: Build
