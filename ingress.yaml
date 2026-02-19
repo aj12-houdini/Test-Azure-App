@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: www.exploreai.co.in
+  - host: https://www.exploreai.co.in
     http:
       paths:
       - path: /
