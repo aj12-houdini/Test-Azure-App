@@ -16,7 +16,7 @@ variables:
   tag: "$(Build.BuildId)" #Tagging our image uniquely with the build agent id
   containerRegistry: 'AzureContainerRegistry' #Container Registry Connections (Gave an alias name in service connections on Azure Devops)
   sourceBranchName: "$(Build.SourceBranchName)" #Source Branch Name
-  dockerFilePath: "DockerFile" #Docker File to build from
+  dockerFilePath: "Dockerfile" #Docker File to build from
   repository: 'test-user-app' #Repository Name in ACR
   vmImageName: 'ubuntu-latest'
   sourceDirectory: "$(Build.SourcesDirectory)"
