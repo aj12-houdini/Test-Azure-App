@@ -8,7 +8,6 @@ COPY . ./
 
 RUN corepack enable
 
-ENV CI=true
 
 RUN pnpm install
 
