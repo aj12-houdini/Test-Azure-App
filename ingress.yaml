@@ -5,7 +5,7 @@ kind: Ingress
 metadata:
   name: test-user-app-ingress
 spec:
-  ingressClassName: nginx
+  ingressClassName: azure-application-gateway
   rules:
    - http:
       paths:
